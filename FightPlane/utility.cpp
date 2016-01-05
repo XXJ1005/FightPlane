@@ -9,6 +9,8 @@
 #include "main.h"
 #include "FightPlane.h"
 
+#include "Load3ds.h"
+
 const double walk_speed = 1.0;
 double cam_pos[3] = { 0, 0, 1.2};
 HGLRC hRC = NULL;
@@ -18,6 +20,7 @@ HDC  hDC = NULL;
 Cloud *cloud;
 GLuint texture = 0;
 ParticleEffect* recover = NULL;
+Model_3DS *plane;
 
 void camLook(){
 	gluLookAt(cam_pos[0], cam_pos[1], cam_pos[2],
@@ -36,6 +39,15 @@ void DrawScene(){
 
 	cloud->draw();
 
+	glPushMatrix();
+	glTranslated(0, 1, -10);
+	glRotatef(180, 0, 0, 1);
+	glRotatef(90, 1, 0, 0);
+	glScalef(0.03, 0.03, 0.03);
+	plane->draw();
+	glPopMatrix();
+
+
 	glEnable(GL_TEXTURE_2D);
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
@@ -46,7 +58,7 @@ void DrawScene(){
 
 	glPushMatrix();
 	glTranslated(0, 1, -10);
-
+	//glColor3f(177/255.0, 17/255.0, 22/255.0);
 	recover->Frame();
 	glPopMatrix();
 
@@ -82,6 +94,7 @@ bool InitScene(){
 	recover = new ParticleEffect("../media/effects/", "magic02");
 
 	cloud = new Cloud("../media/cloud.png", 2);
+	plane = new Model_3DS("../media/plane.3ds", "../media/plane.bmp");
 
 	return true;
 }

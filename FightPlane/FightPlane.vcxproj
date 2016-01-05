@@ -172,6 +172,7 @@
     <ClInclude Include="forkParticle\FrkParticleSystem.h" />
     <ClInclude Include="forkParticle\FrkTrackEvent.h" />
     <ClInclude Include="forkParticle\OGLExtensions.h" />
+    <ClInclude Include="Load3ds.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
@@ -191,6 +192,7 @@
     <ClCompile Include="forkParticle\FrkParticleSystem.cpp" />
     <ClCompile Include="forkParticle\FrkTrackEvent.cpp" />
     <ClCompile Include="forkParticle\OGLExtensions.cpp" />
+    <ClCompile Include="load3ds.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
