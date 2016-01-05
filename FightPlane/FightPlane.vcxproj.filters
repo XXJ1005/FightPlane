@@ -81,6 +81,9 @@
     <ClInclude Include="Load3ds.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="glUtility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="forkParticle\FrkDataServer.cpp">
@@ -138,6 +141,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="load3ds.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="glUtility.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

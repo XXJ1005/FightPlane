@@ -1,13 +1,18 @@
-#include <windows.h>     
-#include <crtdbg.h>
-#include "main.h"
+#include "glUtility.h"
+
+#define W_WIDTH 1000
+#define W_HEIGHT 800
+
+GL_Utility *myGLRender = NULL;
 
 //处理窗口信息
 LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	switch ( message )  {	
 	case WM_SIZE:        // 窗口大小改变
-		Reshape();
+		if (myGLRender) {
+			myGLRender->Reshape();
+		}
 		return 0; 
 	case WM_CLOSE:       // 退出游戏
 		ShowWindow (hWnd, SW_HIDE);
@@ -19,7 +24,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 		// LOWORD(lParam), HIWORD(lParam) 分别代表鼠标光标移动是对应的x和y坐标
 		break;
 	case WM_KEYDOWN:     // 键盘操作
-		KeyHandle(wParam, lParam);
+		myGLRender->KeyHandle(wParam, lParam);
 		break;
 	default:
 		return DefWindowProc( hWnd, message, wParam, lParam );
@@ -45,7 +50,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	wc.lpszClassName = "Name";
 	RegisterClass( &wc );
 	
-	hWnd = CreateWindow(
+	HWND hWnd = CreateWindow(
 			"Name",
 		   "3D飞机大战",
 			WS_TILEDWINDOW | WS_VISIBLE,
@@ -60,10 +65,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	ShowWindow(hWnd, SW_SHOW);
 	UpdateWindow(hWnd);
 	
-	//初始化
-	InitOpenGL();
-	InitScene();
-	Reshape();
+	myGLRender = new GL_Utility(hWnd);
+	double camPos[3] = { 0, 0, 1.2 };
+	double camView[3] = {0, 0, -1};
+	int walkSpeed = 2;
+	myGLRender->InitScene(camPos, camView, walkSpeed);
 
 	MSG msg;
 	//消息获取与发送以及无消息等待时实现动画
@@ -78,13 +84,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 			}
 		}
 		else{ 
-			// 此处实现OpenGL 动画，如果程序被激活并且ESC没有被按下，可以渲染场景及交换缓冲区
-			DrawScene();
-			SwapBuffers(hDC); 
+			myGLRender->Draw();
 		}
 	}
 
-	DestroyOpenGL();
+	delete myGLRender;
 	EndDialog(hWnd, 0);
 	return msg.wParam;
 }
