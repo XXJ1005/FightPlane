@@ -75,9 +75,6 @@
     <ClInclude Include="FightPlane.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Load3ds.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -133,9 +130,6 @@
     </ClCompile>
     <ClCompile Include="forkParticle\ParticleEffect.cpp">
       <Filter>源文件\forkParticle</Filter>
-    </ClCompile>
-    <ClCompile Include="utility.cpp">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FightPlane.cpp">
       <Filter>源文件</Filter>

@@ -9,7 +9,6 @@
 #include <io.h>
 
 #include "ParticleEffect.h"
-#include "main.h"
 #include "FightPlane.h"
 
 extern GLuint LoadTexture(const char *fileName);

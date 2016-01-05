@@ -5,7 +5,6 @@
 #include <atlimage.h>
 
 #include "ParticleEffect.h"
-#include "main.h"
 #include "FightPlane.h"
 
 GLuint LoadTexture(const char *fileName) {
