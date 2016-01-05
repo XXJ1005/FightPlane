@@ -5,7 +5,7 @@
 
 GL_Utility *myGLRender = NULL;
 
-//处理窗口信息//
+//处理窗口信息
 LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	switch ( message )  {	
