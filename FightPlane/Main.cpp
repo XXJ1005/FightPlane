@@ -14,6 +14,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 		PostQuitMessage( 0 );
 		return 0;
 	case WM_LBUTTONDOWN: // 鼠标左键
+		// TODO
 		break;
 	case WM_MOUSEMOVE:   // 光标移动
 		// LOWORD(lParam), HIWORD(lParam) 分别代表鼠标光标移动是对应的x和y坐标
