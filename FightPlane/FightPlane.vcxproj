@@ -172,10 +172,14 @@
     <ClInclude Include="forkParticle\FrkParticleSystem.h" />
     <ClInclude Include="forkParticle\FrkTrackEvent.h" />
     <ClInclude Include="forkParticle\OGLExtensions.h" />
+    <ClInclude Include="FPGameManager.h" />
+    <ClInclude Include="FPGUIManager.h" />
     <ClInclude Include="glUtility.h" />
     <ClInclude Include="Load3ds.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FPGameManager.cpp" />
+    <ClCompile Include="FPGUIManager.cpp" />
     <ClCompile Include="FightPlane.cpp" />
     <ClCompile Include="forkParticle\ParticleEffect.cpp" />
     <ClCompile Include="forkParticle\FrkDataServer.cpp" />

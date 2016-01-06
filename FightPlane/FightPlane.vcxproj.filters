@@ -81,6 +81,12 @@
     <ClInclude Include="glUtility.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="FPGUIManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FPGameManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="forkParticle\FrkDataServer.cpp">
@@ -139,6 +145,12 @@
     </ClCompile>
     <ClCompile Include="glUtility.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FPGUIManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FPGameManager.cpp">
+      <Filter>头文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

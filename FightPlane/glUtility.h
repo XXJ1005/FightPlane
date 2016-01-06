@@ -6,6 +6,7 @@
 #include <GL/GL.h>
 #include <gl/GLU.h>
 
+
 class GL_Utility {
 public:
 	GL_Utility(HWND hwnd);
@@ -17,6 +18,8 @@ public:
 
 	bool InitScene(double *camPos, double *camView, double walkSpeed);
 	void Draw();
+
+	HWND getHwnd() { return m_hwnd; }
 
 private:
 	HGLRC m_hrc;

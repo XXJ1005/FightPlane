@@ -2,6 +2,10 @@
 #include "glUtility.h"
 #include "FightPlane.h"
 #include "Load3ds.h"
+#include "FPGUIManager.h"
+#include "FPGameManager.h"
+
+extern GL_Utility *myGLRender;
 
 GL_Utility::GL_Utility(HWND hwnd) {
 	m_hwnd = hwnd;
@@ -96,6 +100,9 @@ ParticleEffect* recover = NULL;
 Model_3DS *plane = NULL;
 
 bool GL_Utility::InitScene(double *camPos, double *camView, double walkSpeed = 1) {
+	
+	FPGameManager::GetInstance()->SetCurrentGameState(FPGameManager::FPGameState::Start);
+
 	m_camPos[0] = camPos[0], m_camPos[1] = camPos[1], m_camPos[2] = camPos[2];
 	m_camView[0] = camView[0], m_camView[1] = camView[1], m_camView[2] = camView[2];
 	m_walkSpeed = walkSpeed;
@@ -105,11 +112,12 @@ bool GL_Utility::InitScene(double *camPos, double *camView, double walkSpeed = 1
 	glClearColor(0.325f, 0.621f, 0.847f, 1.0f);
 	glClearDepth(1.0f);
 
+	FPGUIManager::GetInstance()->InitGUI();
+
 	recover = new ParticleEffect("../media/effects/", "magic02");
 
 	cloud = new Cloud("../media/cloud.png", 2);
 	plane = new Model_3DS("../media/plane.3ds", "../media/plane.bmp");
-
 	
 	return true;
 }
@@ -152,6 +160,9 @@ void GL_Utility::Draw() {
 	glDisable(GL_BLEND);
 
 	glDisable(GL_TEXTURE_2D);
+
+	// »æÖÆËùÓÐGUI
+	FPGUIManager::GetInstance()->RenderGUI();
 
 	SwapBuffers(m_hdc);
 }

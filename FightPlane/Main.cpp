@@ -1,4 +1,5 @@
 #include "glUtility.h"
+#include "FPGUIManager.h"
 
 #define W_WIDTH 1000
 #define W_HEIGHT 800
@@ -8,7 +9,7 @@ GL_Utility *myGLRender = NULL;
 //处理窗口信息
 LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	switch ( message )  {	
+	switch ( message )  {
 	case WM_SIZE:        // 窗口大小改变
 		if (myGLRender) {
 			myGLRender->Reshape();
@@ -20,9 +21,16 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 		return 0;
 	case WM_LBUTTONDOWN: // 鼠标左键
 		// TODO
-		break;
+		FPGUIManager::GetInstance()->UpdateButtonState(FPGUIManager::MouseState::LBDown, wParam, lParam);
+		FPGUIManager::GetInstance()->LButtonDownHandle(wParam, lParam);
+		return 0;
+	case WM_LBUTTONUP:
+		FPGUIManager::GetInstance()->UpdateButtonState(FPGUIManager::MouseState::LBUp, wParam, lParam);
+		FPGUIManager::GetInstance()->LButtonUpHandle(wParam, lParam);
+		return 0;
 	case WM_MOUSEMOVE:   // 光标移动
 		// LOWORD(lParam), HIWORD(lParam) 分别代表鼠标光标移动是对应的x和y坐标
+		FPGUIManager::GetInstance()->UpdateButtonState(FPGUIManager::MouseState::Move, wParam, lParam);
 		break;
 	case WM_KEYDOWN:     // 键盘操作
 		myGLRender->KeyHandle(wParam, lParam);
@@ -62,14 +70,15 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 			NULL, NULL,
 			hInstance,
 			NULL );
-	
+
 	ShowWindow(hWnd, SW_SHOW);
 	UpdateWindow(hWnd);
 	
 	myGLRender = new GL_Utility(hWnd);
 	double camPos[3] = { 0, 0, 1.2 };
-	double camView[3] = {0, 0, -1};
+	double camView[3] = { 0, 0, -1 };
 	int walkSpeed = 2;
+
 	myGLRender->InitScene(camPos, camView, walkSpeed);
 
 	MSG msg;
