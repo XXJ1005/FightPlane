@@ -118,39 +118,59 @@ Description	:	This function is called periodically by the main thread to process
 Arguments	:	None.
 Return		:	None.
 *****************************************************************************/
-bool ParticleEffect::Frame(){
-	glPushMatrix();
-	SetupMatrices();
+bool ParticleEffect::Frame(int accurate = 1){
 
-	QueryPerformanceCounter(&m_CurTime);
-	
-	if (m_pEffect)
-	{
-		if (m_pEffect->m_nEmitterCount)
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+	glEnable(GL_TEXTURE_2D);
+	glDepthMask(GL_FALSE);
+	glEnable(GL_BLEND);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glMatrixMode(GL_MODELVIEW);
+
+	accurate = accurate > 0 ? accurate : 1;
+	double delta = 180.0 / accurate;
+	for (int i = 0; i < accurate; i++) {
+		glRotatef(delta, 0, 1, 0);
+
+		glPushMatrix();
+		SetupMatrices();
+
+		QueryPerformanceCounter(&m_CurTime);
+
+		if (m_pEffect)
 		{
-			GLuint * pTexture = (GLuint *)frkPAssetGetDataPointer(frkPPropertyGetCurAsset(m_pEffect->m_aParticleEmitter[0]->m_pEmitterInfo));
-			if (pTexture)
+			if (m_pEffect->m_nEmitterCount)
 			{
-				glBindTexture( GL_TEXTURE_2D, *pTexture);
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				GLuint * pTexture = (GLuint *)frkPAssetGetDataPointer(frkPPropertyGetCurAsset(m_pEffect->m_aParticleEmitter[0]->m_pEmitterInfo));
+				if (pTexture)
+				{
+					glBindTexture(GL_TEXTURE_2D, *pTexture);
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				}
 			}
 		}
+
+		m_pPSystem->Update(m_fFrameTDelta);
+
+		if (m_pEffect && m_pEffect->m_bDestroyed)
+		{
+			delete m_pEffect;
+			m_pEffect = NULL;
+		}
+
+		LONGLONG nTCounterDelta = m_CurTime.QuadPart - m_PrevTime.QuadPart;
+		m_fFrameTDelta = (float)((double)nTCounterDelta / (double)m_Frequency.QuadPart);
+
+		m_PrevTime = m_CurTime;
+
+		glPopMatrix();
 	}
-
-	m_pPSystem->Update(m_fFrameTDelta);
-
-	if (m_pEffect && m_pEffect->m_bDestroyed)
-	{
-		delete m_pEffect;
-		m_pEffect = NULL;
-	}
-		
-	LONGLONG nTCounterDelta = m_CurTime.QuadPart - m_PrevTime.QuadPart;
-	m_fFrameTDelta = (float)((double)nTCounterDelta / (double)m_Frequency.QuadPart);
-
-	m_PrevTime = m_CurTime;
-
-	glPopMatrix();
+	
+	glPopAttrib();
 
 	return true;
 }

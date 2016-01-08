@@ -154,7 +154,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="FightPlane.h" />
     <ClInclude Include="forkParticle\ParticleEffect.h" />
     <ClInclude Include="forkParticle\FrkDataServer.h" />
     <ClInclude Include="forkParticle\FrkEmitterDiamond.h" />
@@ -172,11 +171,13 @@
     <ClInclude Include="forkParticle\FrkParticleSystem.h" />
     <ClInclude Include="forkParticle\FrkTrackEvent.h" />
     <ClInclude Include="forkParticle\OGLExtensions.h" />
+    <ClInclude Include="FPGameManager.h" />
+    <ClInclude Include="FPGUIManager.h" />
+    <ClInclude Include="FPmath.h" />
     <ClInclude Include="glUtility.h" />
-    <ClInclude Include="Load3ds.h" />
+    <ClInclude Include="media.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FightPlane.cpp" />
     <ClCompile Include="forkParticle\ParticleEffect.cpp" />
     <ClCompile Include="forkParticle\FrkDataServer.cpp" />
     <ClCompile Include="forkParticle\FrkEmitterDiamond.cpp" />
@@ -192,8 +193,10 @@
     <ClCompile Include="forkParticle\FrkParticleSystem.cpp" />
     <ClCompile Include="forkParticle\FrkTrackEvent.cpp" />
     <ClCompile Include="forkParticle\OGLExtensions.cpp" />
+    <ClCompile Include="FPGameManager.cpp" />
+    <ClCompile Include="FPGUIManager.cpp" />
     <ClCompile Include="glUtility.cpp" />
-    <ClCompile Include="load3ds.cpp" />
+    <ClCompile Include="media.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

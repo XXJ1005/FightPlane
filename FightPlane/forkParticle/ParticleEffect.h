@@ -30,7 +30,7 @@ public:
 	~ParticleEffect() {
 		ShutDown();
 	}
-	bool Frame();
+	bool Frame(int accurate);
 	bool ShutDown();
 
 private:

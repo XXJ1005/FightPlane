@@ -1,0 +1,4 @@
+glTranslated(0, -8, -50);
+glRotatef(180, 0, 0, 1);
+glRotatef(90, 1, 0, 0);
+glScalef(0.1, 0.1, 0.1);

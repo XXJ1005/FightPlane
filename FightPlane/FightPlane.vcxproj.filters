@@ -72,13 +72,19 @@
     <ClInclude Include="forkParticle\ParticleEffect.h">
       <Filter>头文件\forkParticle</Filter>
     </ClInclude>
-    <ClInclude Include="FightPlane.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Load3ds.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="glUtility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FPGameManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FPGUIManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FPmath.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="media.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -131,13 +137,16 @@
     <ClCompile Include="forkParticle\ParticleEffect.cpp">
       <Filter>源文件\forkParticle</Filter>
     </ClCompile>
-    <ClCompile Include="FightPlane.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="load3ds.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="glUtility.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FPGameManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FPGUIManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="media.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

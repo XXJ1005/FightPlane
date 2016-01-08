@@ -1,0 +1,5 @@
+
+glTranslated(0, -3, -10);
+glRotatef(90, 0, 1, 0); // 朝屏幕飞来
+//glRotatef(-90, 0, 1, 0); // 往屏幕飞去
+glScalef(0.01, 0.01, 0.01);
