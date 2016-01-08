@@ -87,7 +87,7 @@ void FPGUIManager::RenderPlayGameGUI() {
 	sprintf(buffer, "SCORE: %d", planeScore);
 	planeScore += rand() % 3;
 
-	if (planeScore >= 10) {
+	if (planeScore >= 100) {
 		FPGameManager::GetInstance()->SetCurrentGameState(FPGameManager::FPGameState::Success);
 		return;
 	}
@@ -450,6 +450,8 @@ void FPText::Render(const char* text) {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glPushAttrib(GL_LIST_BIT);  // 把显示列表属性压入属性堆栈  
 
+	glDisable(GL_TEXTURE_2D);
+
 	// 计字体大小对应像素值
 	HDC hDC = GetDC(GameHwnd);
 	int height = GetDeviceCaps(hDC, LOGPIXELSY); // 一英寸对应像素值，一英寸为72pt
@@ -460,6 +462,9 @@ void FPText::Render(const char* text) {
 	glRasterPos2f(0.0f, 0.0f); // 输出位置
 	glListBase(base - 0);       // 设置显示列表的基础值  
 	glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);  // 调用显示列表绘制字符串  
+
+	glEnable(GL_TEXTURE_2D);
+
 	glPopAttrib();              // 弹出属性堆栈  
 	glPopAttrib();
 }
