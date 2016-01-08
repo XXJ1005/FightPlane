@@ -18,8 +18,8 @@ public:
 	void KeyHandle(WPARAM wParam, LPARAM lParam);
 
 	void setWalkSpeed(float walkSpeed) { m_walkSpeed = walkSpeed; }
-	void setCamPos(Point3F camPos) { m_camPos = camPos; }
-	void setCamView(Point3F camView) { m_camView = camView; }
+	void setCamPos(glm::vec3 camPos) { m_camPos = camPos; }
+	void setCamView(glm::vec3 camView) { m_camView = camView; }
 
 private:
 	HGLRC m_hrc;
@@ -27,6 +27,6 @@ private:
 	HDC  m_hdc;
 
 	float m_walkSpeed;
-	Point3F m_camPos;
-	Point3F m_camView;
+	glm::vec3 m_camPos;
+	glm::vec3 m_camView;
 };

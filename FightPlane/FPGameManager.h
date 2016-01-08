@@ -13,9 +13,11 @@ public:
 	void InitScene();
 	void Draw();
 
-	GL_Utility *GetGLUtility() { return m_gl; }
 	FPGUIManager *GetGuiManager() { return m_guiManager; }
 	FPGameState GetCurrentGameState() { return m_GameState; }
+	EffectFactory *GetEffectFactory() { return m_effectFactory; }
+	ModelFactory *GetModelFactory() { return m_modelFactory; }
+
 	void SetCurrentGameState(FPGameState gameState) { m_GameState = gameState; }
 
 	static FPGameManager *GetInstance() { 
@@ -28,14 +30,16 @@ public:
 private:
 	FPGameManager() {}
 
-	FPGameState m_GameState;    // 游戏当前所处状态
-	GL_Utility *m_gl;           // OpenGL管理器
-	FPGUIManager *m_guiManager; // GUI管理器
+	FPGameState m_GameState;        // 游戏当前所处状态
+	GL_Utility *m_gl;               // OpenGL管理器
+	FPGUIManager *m_guiManager;     // GUI管理器
 
-	Cloud *m_cloud;             // 移动的云
-	ParticleEffect* jetFlame;
-	Model3DS *plane;
-	Model3DS *missile;
+	Cloud *m_cloud;                 // 移动的云
+
+	EffectFactory *m_effectFactory; // 特效工厂
+	ModelFactory *m_modelFactory;   // 模型工厂
+
+	FPModel *m_gamer;
 
 	static FPGameManager *m_Manager;  // 单例模式,指向自身
 };

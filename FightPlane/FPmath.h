@@ -1,4 +1,8 @@
 #pragma once
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
+
+#define PI 3.1415926
 
 // 纹理坐标
 struct UVcoord {
@@ -16,16 +20,6 @@ struct Color4F {
 	float r, g, b, a;
 };
 
-// 空间三维点
-struct Point3F {
-	Point3F(float x = 0, float y = 0, float z = 0) {
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-	float x, y, z;
-};
-
 // 三角面片，a,b,c代表顶点索引
 struct Face {
 	unsigned short a, b, c;
@@ -33,13 +27,13 @@ struct Face {
 
 // 矩形
 struct Rect {
-	Rect(Point3F &bottomLeft, Point3F &topLeft, Point3F &topRight, Point3F &bottomRight) {
+	Rect(glm::vec3 &bottomLeft, glm::vec3 &topLeft, glm::vec3 &topRight, glm::vec3 &bottomRight) {
 		this->bottomLeft = bottomLeft;
 		this->topLeft = topLeft;
 		this->topRight = topRight;
 		this->bottomRight = bottomRight;
 	}
-	Point3F bottomLeft, topLeft, topRight, bottomRight;
+	glm::vec3 bottomLeft, topLeft, topRight, bottomRight;
 };
 
 // 随机数生成器

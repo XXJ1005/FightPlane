@@ -6,6 +6,7 @@
 #include <conio.h>
 #include <io.h>
 #include "media.h"
+#include "FPGameManager.h"
 
 GLuint LoadTexture(const char *fileName) {
 	BITMAP bm;
@@ -47,10 +48,10 @@ Cloud::Cloud(const char *imgPath, Color4F color, int speed) {
 	for (int i = -4000; i <= 0; i++) {
 		double x = 1000 * m_rand.nextFloat() - 500;
 		double y = -m_rand.nextFloat() * m_rand.nextFloat() * 200 - 15;
-		Point3F bottomLeft(x - 32, y - 32, i);
-		Point3F topLeft(x - 32, y + 32, i);
-		Point3F topRight(x + 32, y + 32, i);
-		Point3F bottomRight(x + 32, y - 32, i);
+		glm::vec3 bottomLeft(x - 32, y - 32, i);
+		glm::vec3 topLeft(x - 32, y + 32, i);
+		glm::vec3 topRight(x + 32, y + 32, i);
+		glm::vec3 bottomRight(x + 32, y - 32, i);
 		m_rects.push_back(new Rect(bottomLeft, topLeft, topRight, bottomRight));
 	}
 }
@@ -101,6 +102,33 @@ void Cloud::update() {
 		m_rects[0]->topRight.z = -4000;
 		m_rects[0]->bottomRight.z = -4000;
 	}
+}
+
+// ==========Effect
+
+FPEffect::FPEffect(EffectType type) {
+	m_effect = FPGameManager::GetInstance()->GetEffectFactory()->getEffect(type);
+	m_pos = glm::vec3(0, 0, 0);
+	m_direction = glm::vec3(0, 1, 0);
+	m_scale = 1;
+}
+
+void FPEffect::Draw(int accurate) {
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glTranslatef(m_pos.x, m_pos.y, m_pos.z); //平移
+	if (m_direction.x == 0 && m_direction.y == -1 && m_direction.z == 0) {
+		glRotatef(180, 1.0, 0.0, 0.0);
+	}
+	else if (m_direction.x != 0 || m_direction.y != 1 || m_direction.z != 0){
+		glm::vec3  rotateAxis = glm::cross(glm::vec3(0, 1, 0), m_direction);
+		glRotatef(acos(m_direction.y) * 180 / PI, rotateAxis.x, rotateAxis.y, rotateAxis.z);
+	}
+	glScalef(m_scale, m_scale, m_scale);
+
+	m_effect->Frame(accurate);
+
+	glPopMatrix();
 }
 
 // ==========Model3DS
@@ -172,7 +200,7 @@ Model3DS::Model3DS(char *modelPath, char *texturePath) {
 		{
 			fread(&m_vertexNum, sizeof(unsigned short), 1, modelFile);
 			//printf("Number of vertices: %d\n", m_vertexNum);
-			m_vertex = new Point3F[m_vertexNum];
+			m_vertex = new glm::vec3[m_vertexNum];
 			for (int i = 0; i < m_vertexNum; i++) {
 				fread(&m_vertex[i].x, sizeof(float), 1, modelFile);
 				fread(&m_vertex[i].y, sizeof(float), 1, modelFile);
@@ -262,4 +290,152 @@ void Model3DS::draw() {
 			m_vertex[m_face[index].c].z);
 	}
 	glEnd();
+}
+
+FPModel::FPModel(ModelType type) {
+	m_model = FPGameManager::GetInstance()->GetModelFactory()->getModel(type);
+	m_pos = glm::vec3(0, 0, 0);
+	m_direction = glm::vec3(0, 1, 0);
+	m_scale = 1;
+}
+
+Missile::Missile(ModelType type): FPModel(type){
+	m_currentState = MissileState::Hang;
+
+	m_jetflame = new FPEffect(EffectType::JetFlame);
+	//m_explode = new  FPEffect(EffectType::Explode);
+
+	// 根据导弹类型设置火焰和爆炸效果位置、朝向及大小
+	switch (type) {
+		case ModelType::Missile1:
+			{
+				m_jetflame->setDirection(glm::vec3(0, -1, 0));
+				m_jetflame->setScale(0.6);
+				m_jetflame->setPos(glm::vec3(0, -12, 0));
+
+				/*m_explode->setDirection(glm::vec3(0, 1, 0));
+				m_explode->setScale(2);
+				m_explode->setPos(glm::vec3(0,10,0));*/
+				break;
+			}
+		default:
+			break;
+	}
+	m_time = 5;
+	m_attack = 10;
+}
+
+void Missile::Draw() {
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	// 平移
+	glTranslatef(m_pos.x, m_pos.y, m_pos.z); 
+	// 旋转
+	if (m_direction.x == 0 && m_direction.y == -1 && m_direction.z == 0) {
+		glRotatef(180, 1.0, 0.0, 0.0);
+	}
+	else if (m_direction.x != 0 || m_direction.y != 1 || m_direction.z != 0) {
+		glm::vec3  rotateAxis = glm::cross(glm::vec3(0, 1, 0), m_direction);
+		glRotatef(acos(m_direction.y) * 180 / PI, rotateAxis.x, rotateAxis.y, rotateAxis.z);
+	}
+	glScalef(m_scale, m_scale, m_scale);
+
+	switch (m_currentState) {
+		case MissileState::Hang:
+		{
+			m_model->draw();
+			m_jetflame->Draw(3);
+			break;
+		}
+		case MissileState::Ready:
+		{
+			break;
+		}
+		case MissileState::Fly:
+		{
+			break;
+		}
+		case MissileState::Explode:
+		{
+			break;
+		}
+		default: break;
+	}
+
+	glPopMatrix();
+}
+
+Fighter::Fighter(ModelType type) : FPModel(type) {
+	m_currentState = FighterState::Fly;
+
+	m_jetflame = new FPEffect(EffectType::JetFlame);
+	//m_explode = new  FPEffect(EffectType::Explode);
+
+	m_leftMissile = new Missile(ModelType::Missile1);
+	m_rightMissile = new Missile(ModelType::Missile1);
+
+	// 根据战斗机类型设置火焰及导弹参数
+	switch (type) {
+		case ModelType::Plane1:
+		{
+			m_jetflame->setDirection(glm::vec3(0, -1, 0));
+			m_jetflame->setScale(1.8);
+			m_jetflame->setPos(glm::vec3(0, -38, -2));
+
+			m_leftMissile->setDirection(glm::vec3(-0.1, 1, 0));
+			m_leftMissile->setScale(1.8);
+			m_leftMissile->setPos(glm::vec3(-22, -8, -9.2));
+
+			m_rightMissile->setDirection(glm::vec3(0.1, 1, 0));
+			m_rightMissile->setScale(1.8);
+			m_rightMissile->setPos(glm::vec3(22, -8, -9.2));
+
+			/*m_explode->setDirection(glm::vec3(0, 1, 0));
+			m_explode->setScale(2);
+			m_explode->setPos(glm::vec3(0,10,0));*/
+			break;
+		}
+		default:
+			break;
+	}
+	m_blood = 100;
+	m_attack = 10;
+}
+
+void Fighter::Draw() {
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	// 平移
+	glTranslatef(m_pos.x, m_pos.y, m_pos.z);
+	// 旋转
+	if (m_direction.x == 0 && m_direction.y == -1 && m_direction.z == 0) {
+		glRotatef(180, 1.0, 0.0, 0.0);
+	}
+	else if (m_direction.x != 0 || m_direction.y != 1 || m_direction.z != 0) {
+		glm::vec3  rotateAxis = glm::cross(glm::vec3(0, 1, 0), m_direction);
+		glRotatef(acos(m_direction.y) * 180 / PI, rotateAxis.x, rotateAxis.y, rotateAxis.z);
+	}
+	glScalef(m_scale, m_scale, m_scale);
+
+	switch (m_currentState) {
+		case FighterState::Idle:
+		{
+			break;
+		}
+		case FighterState::Fly:
+		{
+			m_model->draw();
+			m_leftMissile->Draw();
+			m_rightMissile->Draw();
+			m_jetflame->Draw(6);
+			break;
+		}
+		case FighterState::Explode:
+		{
+			break;
+		}
+		default: break;
+	}
+
+	glPopMatrix();
 }

@@ -1,5 +1,6 @@
+﻿弹头朝上（正Y轴）
 
-glTranslated(0, -3, -10);
-glRotatef(90, 0, 1, 0); // 朝屏幕飞来
-//glRotatef(-90, 0, 1, 0); // 往屏幕飞去
-glScalef(0.01, 0.01, 0.01);
+特效参数
+m_jetflame->setDirection(glm::vec3(0, -1, 0));
+m_jetflame->setScale(0.6);
+m_jetflame->setPos(glm::vec3(0, -12, 0));

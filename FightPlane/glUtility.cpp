@@ -18,8 +18,8 @@ GL_Utility::GL_Utility(HWND hwnd) {
 	m_hrc = wglCreateContext(m_hdc);
 	wglMakeCurrent(m_hdc, m_hrc);
 
-	m_camPos = Point3F(0,0,0);
-	m_camView = Point3F(0, 0, -1);
+	m_camPos = glm::vec3(0,0,0);
+	m_camView = glm::vec3(0, 0, -1);
 	m_walkSpeed = 1;
 
 	Reshape();

@@ -10,8 +10,8 @@ void FPGameManager::KeyControl(WPARAM wParam, LPARAM lParam) {
 void FPGameManager::InitScene() {
 	// 初始化OPenGL渲染环境
 	m_gl = new GL_Utility(GameHwnd);
-	m_gl->setCamPos(Point3F(0, 0, 1.2));
-	m_gl->setCamView(Point3F(0, 0, -1));
+	m_gl->setCamPos(glm::vec3(0, 0, 1.2));
+	m_gl->setCamView(glm::vec3(0, 0, -1));
 	m_gl->setWalkSpeed(2);
 	glClearColor(0.325 / 1, 0.621 / 1, 0.847 / 1, 1.0f);
 	glClearDepth(1.0f);
@@ -25,9 +25,17 @@ void FPGameManager::InitScene() {
 
 	// 初始化游戏资源
 	m_cloud = new Cloud("../media/cloud.png", Color4F(0.9, 0.9, 0.9, 1.0), 3);
-	jetFlame = new ParticleEffect("../media/effects/", "fire_sample");
-	missile = new Model3DS("../media/missile1/model.3ds", "../media/missile1/texture.png");
-	plane = new Model3DS("../media/plane1/model.3ds", "../media/plane1/texture.png");
+
+	m_effectFactory = new EffectFactory();
+	m_effectFactory->Init();
+
+	m_modelFactory = new ModelFactory();
+	m_modelFactory->Init();
+
+	m_gamer = new Fighter(ModelType::Plane1);
+	m_gamer->setDirection(glm::vec3(0, 0, -1));
+	m_gamer->setScale(0.2);
+	m_gamer->setPos(glm::vec3(0, -8, -50));
 }
 
 void FPGameManager::Draw() {
@@ -41,51 +49,8 @@ void FPGameManager::Draw() {
 	// 绘制云朵
 	m_cloud->draw();
 
-	// 绘制导弹
-	glPushMatrix();
-	glTranslated(-6, -10.2, -47);
-	glRotatef(-90, 0, 1, 0);
-	glScalef(0.1, 0.1, 0.1);
-	missile->draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslated(6, -10.2, -47);
-	glRotatef(-90, 0, 1, 0);
-	glScalef(0.1, 0.1, 0.1);
-	missile->draw();
-	glPopMatrix();
-
 	// 绘制飞机
-	glPushMatrix();
-	glTranslated(0, -8, -50);
-	glRotatef(-90, 0, 1, 0);
-	glRotatef(-90, 1, 0, 0);
-	glScalef(0.5, 0.5, 0.5);
-	plane->draw();
-	glPopMatrix();
-
-	// 绘制火焰
-	glPushMatrix();
-	glTranslated(6, -10.2, -42);
-	glRotatef(90, 1, 0, 0);
-	glScalef(0.2, 0.2, 0.2);
-	jetFlame->Frame(3);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslated(-6, -10.2, -42);
-	glRotatef(90, 1, 0, 0);
-	glScalef(0.2, 0.2, 0.2);
-	jetFlame->Frame(3);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslated(0, -8.5, -40);
-	glRotatef(90, 1, 0, 0);
-	glScalef(0.4, 0.4, 0.4);
-	jetFlame->Frame(6);
-	glPopMatrix();
+	m_gamer->Draw();
 
 	// 绘制所有GUI
 	m_guiManager->RenderGUI();
