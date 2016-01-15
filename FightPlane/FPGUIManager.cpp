@@ -1,5 +1,8 @@
 #include <windows.h>
-#include "glUtility.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <GL/GL.h>
+#include <gl/GLU.h>
 #include "FPGUIManager.h"
 #include "FPGameManager.h"
 

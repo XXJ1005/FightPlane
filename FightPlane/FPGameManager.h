@@ -1,6 +1,5 @@
 #pragma once
-#include "media.h"
-#include "glUtility.h"
+#include "FPOBJManager.h"
 #include "FPGUIManager.h"
 
 extern HWND GameHwnd;  // 游戏窗口句柄
@@ -8,15 +7,25 @@ extern HWND GameHwnd;  // 游戏窗口句柄
 class FPGameManager {
 public:
 	enum FPGameState { Start, Play, Success, Failure };
+	~FPGameManager() {
+		if (m_cloud) {
+			delete m_cloud;
+		}
+		if (m_guiManager) {
+			delete m_guiManager;
+		}
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(m_hrc);
+		ReleaseDC(GameHwnd, m_hdc);
+	}
 
 	void KeyControl(WPARAM wParam, LPARAM lParam);
 	void InitScene();
 	void Draw();
+	void Update();
 
 	FPGUIManager *GetGuiManager() { return m_guiManager; }
 	FPGameState GetCurrentGameState() { return m_GameState; }
-	EffectFactory *GetEffectFactory() { return m_effectFactory; }
-	ModelFactory *GetModelFactory() { return m_modelFactory; }
 
 	void SetCurrentGameState(FPGameState gameState) { m_GameState = gameState; }
 
@@ -28,18 +37,17 @@ public:
 	}
 
 private:
-	FPGameManager() {}
+	FPGameManager();
+	static FPGameManager *m_Manager;  // 单例模式,指向自身
 
 	FPGameState m_GameState;        // 游戏当前所处状态
-	GL_Utility *m_gl;               // OpenGL管理器
 	FPGUIManager *m_guiManager;     // GUI管理器
+	FPOBJManager *m_objManager;     // 游戏对象管理器
+	Cloud *m_cloud;                 // 移动的云，游戏背景
 
-	Cloud *m_cloud;                 // 移动的云
-
-	EffectFactory *m_effectFactory; // 特效工厂
-	ModelFactory *m_modelFactory;   // 模型工厂
-
-	FPModel *m_gamer;
-
-	static FPGameManager *m_Manager;  // 单例模式,指向自身
+	HGLRC m_hrc;
+	HDC  m_hdc;
+	double m_rotateSpeed;
+	double m_walkSpeed;
+	glm::vec3 m_camPos;
 };

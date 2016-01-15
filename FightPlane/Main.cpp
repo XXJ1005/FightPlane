@@ -1,4 +1,8 @@
+
+#pragma comment( linker, "/subsystem:console /entry:WinMainCRTStartup" )
 #include "FPGameManager.h"
+#include <iostream>
+using namespace std;
 
 #define W_WIDTH 1000
 #define W_HEIGHT 800
@@ -35,6 +39,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	LPSTR     lpCmdLine,
 	int       nCmdShow)
 {
+	//redirectIOToConsole();
 	//创建OpenGL窗口，设置标题、宽高及颜色数
 	WNDCLASS wc;
 	wc.style = CS_OWNDC;
@@ -82,6 +87,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		else {
 			// 绘制游戏
 			FPGameManager::GetInstance()->Draw();
+			FPGameManager::GetInstance()->Update();
 		}
 	}
 
