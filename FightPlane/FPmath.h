@@ -23,6 +23,15 @@ struct Point3F {
 		this->y = y;
 		this->z = z;
 	}
+
+	friend Point3F operator + (Point3F& left, Point3F& right) {
+		return Point3F(left.x + right.x, left.y + right.y, left.z + right.z);
+	}
+
+	friend Point3F operator * (Point3F& p, double d) {
+		return Point3F(p.x * d, p.y * d, p.z * d);
+	}
+
 	float x, y, z;
 };
 

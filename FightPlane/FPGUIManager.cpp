@@ -37,7 +37,7 @@ void FPGUIManager::InitStartGameGUI() {
 	RECT windowsRect;
 	GetClientRect(GameHwnd, &windowsRect);
 
-	FPFrame *startGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 100, windowsRect.bottom / 2.0 + 60, 200, 100);
+	FPFrame *startGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 120, windowsRect.bottom / 2.0 - 60, 240, 60);
 	const char* startGameNormalTexture = "../media/icon/start_game_btn_normal.png";
 	const char* startGameDownTexture = "../media/icon/start_game_btn_down.png";
 	const char* startGameOverTexture = "../media/icon/start_game_btn_over.png";
@@ -45,16 +45,28 @@ void FPGUIManager::InitStartGameGUI() {
 	
 	m_GameStartButtons.push_back(startGameButton);
 
-	FPFrame *overGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 100, windowsRect.bottom / 2.0 - 60, 200, 100);
+	FPFrame *overGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 120, windowsRect.bottom / 2.0 - 150, 240, 60);
 	const char* overGameNormalTexture = "../media/icon/over_game_btn_normal.png";
 	const char* overGameDownTexture = "../media/icon/over_game_btn_down.png";
 	const char* overGameOverTexture = "../media/icon/over_game_btn_over.png";
 	FPButton *overGameButton = new FPButton(overGameBtnFrame, overGameNormalTexture, overGameDownTexture, overGameOverTexture, overGameBtnDownBlock, overGameBtnUpBlock);
 
 	m_GameStartButtons.push_back(overGameButton);
+
+	FPFrame *startGameLogoFrame = new FPFrame(windowsRect.right / 2.0 - 250, windowsRect.bottom / 2.0 + 10, 500, 360);
+	m_GameStartLogo = new FPIcon("../media/icon/start_game_logo.png", startGameLogoFrame);
+
+	FPFrame *frame = new FPFrame(windowsRect.left, windowsRect.top, windowsRect.right - windowsRect.left, windowsRect.bottom - windowsRect.top);
+	m_GameStartBackground = new FPIcon("../media/icon/game_background.png", frame);
+	
 }
 
 void FPGUIManager::RenderStartGameGUI() {
+	// 绘制背景
+	m_GameStartBackground->Render();
+
+	// 绘制logo
+	m_GameStartLogo->Render();
 	// 按钮更新
 	for (FPButton *button : m_GameStartButtons) {
 		button->Render();
@@ -87,7 +99,7 @@ void FPGUIManager::RenderPlayGameGUI() {
 	sprintf(buffer, "SCORE: %d", planeScore);
 	planeScore += rand() % 3;
 
-	if (planeScore >= 100) {
+	if (planeScore >= 10000) {
 		FPGameManager::GetInstance()->SetCurrentGameState(FPGameManager::FPGameState::Success);
 		return;
 	}
@@ -100,7 +112,7 @@ void FPGUIManager::RenderPlayGameGUI() {
 
 	if (timeCount > 10) {
 		lifeCount = rand() % 5;
-		if (lifeCount == 0) {
+		if (lifeCount < 0) {
 			FPGameManager::GetInstance()->SetCurrentGameState(FPGameManager::FPGameState::Failure);
 			return;
 		}
@@ -121,12 +133,12 @@ void FPGUIManager::InitSuccessGameGUI() {
 	GetClientRect(GameHwnd, &windowsRect);
 
 	// 胜利图标
-	FPFrame *frame = new FPFrame(windowsRect.right / 2.0 - 150, windowsRect.bottom / 2.0 + 80, 300, 200);
+	FPFrame *frame = new FPFrame(windowsRect.right / 2.0 - 210, windowsRect.bottom / 2.0 + 40, 420, 280);
 	m_gameSuccessIcon = new FPIcon("../media/icon/success.png" ,frame);
 
 	// 创建重新开始游戏按钮
 
-	FPFrame *restartGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 100, windowsRect.bottom / 2.0 - 60, 200, 100);
+	FPFrame *restartGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 120, windowsRect.bottom / 2.0 - 80, 240, 60);
 	const char* restartGameNormalTexture = "../media/icon/restart_game_btn_normal.png";
 	const char* restartGameDownTexture = "../media/icon/restart_game_btn_down.png";
 	const char* restartGameOverTexture = "../media/icon/restart_game_btn_over.png";
@@ -134,7 +146,7 @@ void FPGUIManager::InitSuccessGameGUI() {
 
 	m_GameSuccessButtons.push_back(restartGameButton);
 
-	FPFrame *overGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 100, windowsRect.bottom / 2.0 - 180, 200, 100);
+	FPFrame *overGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 120, windowsRect.bottom / 2.0 - 180, 240, 60);
 	const char* overGameNormalTexture = "../media/icon/over_game_btn_normal.png";
 	const char* overGameDownTexture = "../media/icon/over_game_btn_down.png";
 	const char* overGameOverTexture = "../media/icon/over_game_btn_over.png";
@@ -158,13 +170,17 @@ void FPGUIManager::InitFailureGameGUI() {
 	RECT windowsRect;
 	GetClientRect(GameHwnd, &windowsRect);
 
-	// 胜利图标
-	FPFrame *frame = new FPFrame(windowsRect.right / 2.0 - 150, windowsRect.bottom / 2.0 + 80, 300, 200);
+	// 失败背景
+	FPFrame *backgroundFrame = new FPFrame(windowsRect.left, windowsRect.top, windowsRect.right - windowsRect.left, windowsRect.bottom - windowsRect.top);
+	m_gameFailureBackground = new FPIcon("../media/icon/overgame_background.png", backgroundFrame);
+
+	// 失败图标
+	FPFrame *frame = new FPFrame(windowsRect.right / 2.0 - 250, windowsRect.bottom / 2.0 - 100, 500, 318);
 	m_gameFailureIcon = new FPIcon("../media/icon/failure.png", frame);
 
 	// 创建重新开始游戏按钮
 
-	FPFrame *restartGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 100, windowsRect.bottom / 2.0 - 60, 200, 100);
+	FPFrame *restartGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 120, windowsRect.bottom / 2.0 + 30, 240, 60);
 	const char* restartGameNormalTexture = "../media/icon/restart_game_btn_normal.png";
 	const char* restartGameDownTexture = "../media/icon/restart_game_btn_down.png";
 	const char* restartGameOverTexture = "../media/icon/restart_game_btn_over.png";
@@ -172,7 +188,7 @@ void FPGUIManager::InitFailureGameGUI() {
 
 	m_GameFailureButtons.push_back(restartGameButton);
 
-	FPFrame *overGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 100, windowsRect.bottom / 2.0 - 180, 200, 100);
+	FPFrame *overGameBtnFrame = new FPFrame(windowsRect.right / 2.0 - 120, windowsRect.bottom / 2.0 - 90, 240, 60);
 	const char* overGameNormalTexture = "../media/icon/over_game_btn_normal.png";
 	const char* overGameDownTexture = "../media/icon/over_game_btn_down.png";
 	const char* overGameOverTexture = "../media/icon/over_game_btn_over.png";
@@ -182,13 +198,14 @@ void FPGUIManager::InitFailureGameGUI() {
 }
 
 void FPGUIManager::RenderFailureGameGUI() {
+	m_gameFailureBackground->Render();
+
+	// 
+	m_gameFailureIcon->Render();
 	// 按钮更新
 	for (FPButton *button : m_GameFailureButtons) {
 		button->Render();
 	}
-
-	// 
-	m_gameFailureIcon->Render();
 }
 
 void FPGUIManager::LButtonDownHandle(WPARAM wParam, LPARAM lParam) {
@@ -528,6 +545,8 @@ void startGameBtnUpBlock(ButtonType type) {
 	if (type == ButtonType::LButton) {
 		// 进入游戏
 		FPGameManager::GetInstance()->SetCurrentGameState(FPGameManager::FPGameState::Play);
+		FPGameManager::GetInstance()->GetSoundManager()->StopStartGameBGM();
+		FPGameManager::GetInstance()->GetSoundManager()->PlayPlayingGameBGM();
 	}
 }
 

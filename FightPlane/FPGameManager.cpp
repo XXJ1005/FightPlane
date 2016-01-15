@@ -23,6 +23,10 @@ void FPGameManager::InitScene() {
 	m_guiManager = new FPGUIManager();
 	m_guiManager->InitGUI();
 
+	// 播放所有声音
+	m_soundManager = new FPSoundManager();
+	m_soundManager->PlayStartGameBGM();
+
 	// 初始化游戏资源
 	m_cloud = new Cloud("../media/cloud.png", Color4F(0.9, 0.9, 0.9, 1.0), 3);
 	jetFlame = new ParticleEffect("../media/effects/", "fire_sample");

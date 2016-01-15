@@ -77,9 +77,22 @@ private:
 class FPModel {
 public:
 
+	Point3F getDirection() { return m_direction; }
+	void setDirection(double deltaTime);
+
+	Point3F getPos() { return m_pos; }
+	void setPos(double deltaTime);
+
+	void setLastDirection(Point3F lastDir) { m_lastDirection = lastDir; }
+	void setLastPos(Point3F lastPos) { m_lastPos = lastPos; }
+
 private:
 	Point3F m_pos;
-	Point3F m_diection;
+	Point3F m_direction;
+
+	Point3F m_lastPos;
+	Point3F m_lastDirection;
+
 	float m_scale;
 
 	Model3DS *m_mesh;

@@ -39,6 +39,8 @@ private:
 	void InitFailureGameGUI();
 
 	// Start
+	FPIcon *m_GameStartLogo;
+	FPIcon *m_GameStartBackground;
 	vector<FPButton *> m_GameStartButtons;
 	// Play
 	FPText *m_ScoreText;
@@ -49,6 +51,7 @@ private:
 	// Failure
 	vector<FPButton *> m_GameFailureButtons;
 	FPIcon *m_gameFailureIcon;
+	FPIcon *m_gameFailureBackground;
 
 	static FPGUIManager *m_Manager;
 };

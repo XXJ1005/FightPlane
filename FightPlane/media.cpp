@@ -263,3 +263,12 @@ void Model3DS::draw() {
 	}
 	glEnd();
 }
+
+// ==========FPModel
+void FPModel::setDirection(double deltaTime) {
+	m_direction = m_lastDirection;
+}
+
+void FPModel::setPos(double deltaTime) {
+	m_pos = m_lastPos + m_lastDirection * deltaTime;
+}

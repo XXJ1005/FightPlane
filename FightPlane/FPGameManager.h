@@ -2,6 +2,7 @@
 #include "media.h"
 #include "glUtility.h"
 #include "FPGUIManager.h"
+#include "FPSoundManager.h"
 
 extern HWND GameHwnd;  // 游戏窗口句柄
 
@@ -15,6 +16,7 @@ public:
 
 	GL_Utility *GetGLUtility() { return m_gl; }
 	FPGUIManager *GetGuiManager() { return m_guiManager; }
+	FPSoundManager *GetSoundManager() { return m_soundManager; }
 	FPGameState GetCurrentGameState() { return m_GameState; }
 	void SetCurrentGameState(FPGameState gameState) { m_GameState = gameState; }
 
@@ -31,6 +33,7 @@ private:
 	FPGameState m_GameState;    // 游戏当前所处状态
 	GL_Utility *m_gl;           // OpenGL管理器
 	FPGUIManager *m_guiManager; // GUI管理器
+	FPSoundManager *m_soundManager; // Sound管理器
 
 	Cloud *m_cloud;             // 移动的云
 	ParticleEffect* jetFlame;
