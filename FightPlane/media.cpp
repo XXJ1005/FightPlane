@@ -6,6 +6,10 @@
 #include <conio.h>
 #include <io.h>
 #include "media.h"
+#include "FPGameManager.h"
+
+#include <iostream>
+using namespace std;
 
 GLuint LoadTexture(const char *fileName) {
 	BITMAP bm;
@@ -47,15 +51,15 @@ Cloud::Cloud(const char *imgPath, Color4F color, int speed) {
 	for (int i = -4000; i <= 0; i++) {
 		double x = 1000 * m_rand.nextFloat() - 500;
 		double y = -m_rand.nextFloat() * m_rand.nextFloat() * 200 - 15;
-		Point3F bottomLeft(x - 32, y - 32, i);
-		Point3F topLeft(x - 32, y + 32, i);
-		Point3F topRight(x + 32, y + 32, i);
-		Point3F bottomRight(x + 32, y - 32, i);
+		glm::vec3 bottomLeft(x - 32, y - 32, i);
+		glm::vec3 topLeft(x - 32, y + 32, i);
+		glm::vec3 topRight(x + 32, y + 32, i);
+		glm::vec3 bottomRight(x + 32, y - 32, i);
 		m_rects.push_back(new Rect(bottomLeft, topLeft, topRight, bottomRight));
 	}
 }
 
-void Cloud::draw() {
+void Cloud::Draw() {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 
 	glEnable(GL_TEXTURE_2D);
@@ -80,11 +84,9 @@ void Cloud::draw() {
 	glEnd();
 
 	glPopAttrib();
-
-	update();
 }
 
-void Cloud::update() {
+void Cloud::Update() {
 	// 更新云朵，让其向前移动
 	for (int count = 0; count < m_speed; count++) {
 		Rect *buffer = m_rects[m_rects.size() - 1];
@@ -101,6 +103,34 @@ void Cloud::update() {
 		m_rects[0]->topRight.z = -4000;
 		m_rects[0]->bottomRight.z = -4000;
 	}
+}
+
+// ==========Effect
+EffectFactory* EffectFactory::m_effectFactory = NULL;
+
+FPEffect::FPEffect(EffectType type) {
+	m_effect = EffectFactory::getInstance()->getEffect(type);
+	m_pos = glm::vec3(0, 0, 0);
+	m_direction = glm::vec3(0, 1, 0);
+	m_scale = 1;
+}
+
+void FPEffect::Draw(int accurate) {
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glTranslatef(m_pos.x, m_pos.y, m_pos.z); //平移
+	if (m_direction.x == 0 && m_direction.y == -1 && m_direction.z == 0) {
+		glRotatef(180, 1.0, 0.0, 0.0);
+	}
+	else if (m_direction.x != 0 || m_direction.y != 1 || m_direction.z != 0){
+		glm::vec3  rotateAxis = glm::cross(glm::vec3(0, 1, 0), m_direction);
+		glRotatef(acos(m_direction.y) * 180 / PI, rotateAxis.x, rotateAxis.y, rotateAxis.z);
+	}
+	glScalef(m_scale, m_scale, m_scale);
+
+	m_effect->Frame(accurate);
+
+	glPopMatrix();
 }
 
 // ==========Model3DS
@@ -172,7 +202,7 @@ Model3DS::Model3DS(char *modelPath, char *texturePath) {
 		{
 			fread(&m_vertexNum, sizeof(unsigned short), 1, modelFile);
 			//printf("Number of vertices: %d\n", m_vertexNum);
-			m_vertex = new Point3F[m_vertexNum];
+			m_vertex = new glm::vec3[m_vertexNum];
 			for (int i = 0; i < m_vertexNum; i++) {
 				fread(&m_vertex[i].x, sizeof(float), 1, modelFile);
 				fread(&m_vertex[i].y, sizeof(float), 1, modelFile);
@@ -264,11 +294,218 @@ void Model3DS::draw() {
 	glEnd();
 }
 
-// ==========FPModel
-void FPModel::setDirection(double deltaTime) {
-	m_direction = m_lastDirection;
+ModelFactory* ModelFactory::m_modelFactory = NULL;
+
+Missile::Missile(){
+	m_model = ModelFactory::getInstance()->getModel(ModelType::M_Missile);
+	m_coverBox = new CoverBox();
+	m_coverBox->updateBV(m_model);
+	m_currentState = MissileState::Idle;
+	m_jetflame = new FPEffect(EffectType::JetFlame);
+	m_explode = new FPEffect(EffectType::Explode);
+
+	m_damage = 10;
+	m_time = 400;
+	m_path = new LinePath(glm::vec3(0,0,-1),1);
+
+	// 设置特效位置、朝向及大小
+	m_jetflame->setDirection(glm::vec3(0, 0, 1));
+	m_jetflame->setScale(0.6);
+	m_jetflame->setPos(glm::vec3(0, 0, 12));
+
+	m_explode->setDirection(glm::vec3(0, 0, -1));
+	m_explode->setScale(1);
+	m_explode->setPos(glm::vec3(0, 0, 0));
 }
 
-void FPModel::setPos(double deltaTime) {
-	m_pos = m_lastPos + m_lastDirection * deltaTime;
+void Missile::DealCollision(int damage) {
+	if (m_currentState != MissileState::Explode) {
+		m_currentState = MissileState::Explode;
+		m_time = 40;
+	}
+}
+
+void Missile::Draw() {
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	switch (m_currentState) {
+		case MissileState::Hang:
+		{
+			glm::mat4 currentMat = getPose();
+			glMultMatrixf(&m_originPose[0][0]);
+			glMultMatrixf(&currentMat[0][0]);
+			m_model->draw();
+			//m_jetflame->Draw(3);
+			break;
+		}
+		case MissileState::Ready:
+		{
+			if (m_time > 380) {
+				m_position.y -= 0.1;
+				glm::mat4 currentMat = getPose();
+				glMultMatrixf(&currentMat[0][0]);
+				glMultMatrixf(&m_originPose[0][0]);
+				m_model->draw();
+				//m_jetflame->Draw(3);
+			}
+			else {
+				m_currentState = MissileState::Fly;
+			}
+			m_time--;
+			break;
+		}
+		case MissileState::Fly:
+		{
+			if (m_time > 20) {
+				glm::mat4 currentMat = getPose();
+				m_pathPose = m_path->getNextPose();
+				glMultMatrixf(&currentMat[0][0]);
+				glMultMatrixf(&m_originPose[0][0]);
+				glMultMatrixf(&m_pathPose[0][0]);
+				m_model->draw();
+				m_jetflame->Draw(3);
+			}
+			else {
+				m_currentState = MissileState::Explode;
+			}
+			m_time--;
+			break;
+		}
+		case MissileState::Explode:
+		{
+			if (m_time > 20) {
+				glm::mat4 currentMat = getPose();
+				glm::mat4 pose = m_path->getNextPose();
+				glMultMatrixf(&currentMat[0][0]);
+				glMultMatrixf(&m_originPose[0][0]);
+				glMultMatrixf(&pose[0][0]);
+				m_explode->Draw(8);
+				m_time--;
+			}
+			else {
+				Reset();
+			}
+			break;
+		}
+		default: break;
+	}
+
+	glPopMatrix();
+}	
+
+GamerFighter::GamerFighter() {
+	m_model = ModelFactory::getInstance()->getModel(ModelType::M_GamerFighter);
+	m_time = 0;
+	m_blood = 100;
+	m_coverBox = new CoverBox();
+	m_coverBox->updateBV(m_model);
+
+	m_jetflame = new FPEffect(EffectType::JetFlame);
+	m_jetflame->setDirection(glm::vec3(0, 0, 1));
+	m_jetflame->setScale(1.8);
+	m_jetflame->setPos(glm::vec3(0, -2, 38));
+
+	m_leftMissile = new Missile();
+	m_leftMissile->setMissileState(Missile::MissileState::Hang);
+	m_leftMissile->setDirection(glm::vec3(-0.1, 0, -1));
+	m_leftMissile->setScale(1.8);
+	m_leftMissile->setPosition(glm::vec3(-22, -9.2, 8));
+
+	m_rightMissile = new Missile();
+	m_rightMissile->setMissileState(Missile::MissileState::Hang);
+	m_rightMissile->setDirection(glm::vec3(0.1, 0, -1));
+	m_rightMissile->setScale(1.8);
+	m_rightMissile->setPosition(glm::vec3(22, -9.2, 8));
+}
+
+void GamerFighter::Draw(){
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glm::mat4 currentMat = getPose();
+	glMultMatrixf(&currentMat[0][0]);
+	m_model->draw();
+	m_jetflame->Draw(6);
+	glPopMatrix();
+
+	m_leftMissile->setOriginPose(currentMat);
+	m_leftMissile->Draw();
+
+	m_rightMissile->setOriginPose(currentMat);
+	m_rightMissile->Draw();
+}
+
+void GamerFighter::Update(FPOBJManager *objManager) {
+	if (m_time % 50 == 0) {
+		glm::mat4 currentMat = getPose();
+		objManager->addGamerMissile(currentMat * m_leftMissile->getPose()); 
+		objManager->addGamerMissile(currentMat * m_rightMissile->getPose());
+	}
+	m_time++;
+}
+
+void GamerFighter::DealCollision(int damage) {
+	m_blood -= damage;
+}
+
+EnemyFighter::EnemyFighter() {
+	m_model = ModelFactory::getInstance()->getModel(ModelType::M_EnemyFighter);
+	m_time = 0;
+	m_blood = 100;
+	m_coverBox = new CoverBox();
+	m_coverBox->updateBV(m_model);
+	m_path = new LinePath(glm::vec3(0, 0, -1), 0.3);
+
+	m_jetflame = new FPEffect(EffectType::JetFlame);
+	m_jetflame->setDirection(glm::vec3(0, 0, 1));
+	m_jetflame->setScale(2);
+	m_jetflame->setPos(glm::vec3(0, 0, 36));
+	
+	m_leftMissile = new Missile();
+	m_leftMissile->setMissileState(Missile::MissileState::Hang);
+	m_leftMissile->setDirection(glm::vec3(0, 0, -1));
+	m_leftMissile->setScale(1.2);
+	m_leftMissile->setPosition(glm::vec3(-18, -5, 6.0));
+	
+	m_rightMissile = new Missile();
+	m_rightMissile->setMissileState(Missile::MissileState::Hang);
+	m_rightMissile->setDirection(glm::vec3(0, 0, -1));
+	m_rightMissile->setScale(1.2);
+	m_rightMissile->setPosition(glm::vec3(18, -5, 6.0));
+}
+
+void EnemyFighter::DealCollision(int damage) {
+	Reset();
+}
+
+void EnemyFighter::Draw() {
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	m_pathPose = m_path->getNextPose();
+	glm::mat4 currentMat = getWorldPose();
+	glMultMatrixf(&currentMat[0][0]);
+	m_model->draw();
+	m_jetflame->Draw(6);
+	glPopMatrix();
+
+	m_leftMissile->setOriginPose(currentMat);
+	m_leftMissile->Draw();
+
+	m_rightMissile->setOriginPose(currentMat);
+	m_rightMissile->Draw();
+}
+
+void EnemyFighter::Update(FPOBJManager *objManager) {
+	if (m_time > 400) {
+		Reset();
+		objManager->addEnemyFighter();
+		return;
+	}
+	if (m_time % 80 == 0) {
+		glm::mat4 currentMat = getWorldPose();
+		objManager->addEnemyMissile(currentMat * m_leftMissile->getPose());
+		objManager->addEnemyMissile(currentMat * m_rightMissile->getPose());
+	}
+	m_time++;
 }

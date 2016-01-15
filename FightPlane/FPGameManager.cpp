@@ -1,23 +1,89 @@
 #include "FPGameManager.h"
+#include <iostream>
+using namespace std;
 
 HWND GameHwnd = NULL;
 FPGameManager *FPGameManager::m_Manager = nullptr;
 
+FPGameManager::FPGameManager() {
+	// 初始化OpenGL渲染环境
+	GLuint PixelFormat;
+	PIXELFORMATDESCRIPTOR pfd;
+	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
+	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+	pfd.nVersion = 1;
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.cColorBits = 16;
+	pfd.cDepthBits = 16;
+
+	m_hdc = GetDC(GameHwnd);
+	PixelFormat = ChoosePixelFormat(m_hdc, &pfd);
+	SetPixelFormat(m_hdc, PixelFormat, &pfd);
+	m_hrc = wglCreateContext(m_hdc);
+	wglMakeCurrent(m_hdc, m_hrc);
+
+	// 设置透视投影矩阵
+	RECT rect;
+	GetWindowRect(GameHwnd, &rect);
+	int w = rect.right - rect.left;
+	int h = rect.bottom - rect.top;
+	if (h == 0) { h = 1;}
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0f, (GLfloat)w / (GLfloat)h, 1.0f, 1000.0f);
+}
+
 void FPGameManager::KeyControl(WPARAM wParam, LPARAM lParam) {
-	m_gl->KeyHandle(wParam, lParam);
+	if (m_GameState != FPGameState::Play) {
+		return;
+	}
+	glm::vec3 gamer_pos = m_objManager->getGamer()->getPos();
+	float gamer_rotate = m_objManager->getGamer()->getRotate();
+	switch (wParam)
+	{
+		case VK_UP:
+			m_camPos.z -= m_walkSpeed;
+			gamer_pos.z -= m_walkSpeed;
+			break;
+		case VK_RIGHT:
+			gamer_rotate += m_rotateSpeed;
+			break;
+		case VK_LEFT:
+			gamer_rotate -= m_rotateSpeed;
+			break;
+		case 'W':
+			m_camPos.y += m_walkSpeed;
+			gamer_pos.y += m_walkSpeed;
+			break;
+		case 'S':
+			m_camPos.y -= m_walkSpeed;
+			gamer_pos.y -= m_walkSpeed;
+			break;
+		case 'A':
+			m_camPos.x -= m_walkSpeed;
+			gamer_pos.x -= m_walkSpeed;
+			break;
+		case 'D':
+			m_camPos.x += m_walkSpeed;
+			gamer_pos.x += m_walkSpeed;
+			break;
+		default: break;
+	}
+	m_objManager->getGamer()->setPosition(gamer_pos);
+	m_objManager->getGamer()->setRotate(gamer_rotate);
 }
 
 void FPGameManager::InitScene() {
-	// 初始化OPenGL渲染环境
-	m_gl = new GL_Utility(GameHwnd);
-	m_gl->setCamPos(Point3F(0, 0, 1.2));
-	m_gl->setCamView(Point3F(0, 0, -1));
-	m_gl->setWalkSpeed(2);
-	glClearColor(0.325 / 1, 0.621 / 1, 0.847 / 1, 1.0f);
+	glClearColor(0.325 / 1.2, 0.621 / 1.2, 0.847 / 1.2, 1.0f);
 	glClearDepth(1.0f);
+	m_walkSpeed = 0.5;
+	m_rotateSpeed = 2.0;
+	m_camPos = glm::vec3(0, 0, 0);
 
 	// 设置游戏状态
-	m_GameState = FPGameState::Start;
+	m_GameState = FPGameState::Play;
 
 	// 初始化游戏UI界面
 	m_guiManager = new FPGUIManager();
@@ -27,11 +93,12 @@ void FPGameManager::InitScene() {
 	m_soundManager = new FPSoundManager();
 	m_soundManager->PlayStartGameBGM();
 
-	// 初始化游戏资源
-	m_cloud = new Cloud("../media/cloud.png", Color4F(0.9, 0.9, 0.9, 1.0), 3);
-	jetFlame = new ParticleEffect("../media/effects/", "fire_sample");
-	missile = new Model3DS("../media/missile1/model.3ds", "../media/missile1/texture.png");
-	plane = new Model3DS("../media/plane1/model.3ds", "../media/plane1/texture.png");
+	// 初始化游戏对象管理器
+	m_objManager = new FPOBJManager();
+	m_objManager->InitOBJ();
+
+	// 初始化云朵
+	m_cloud = new Cloud("../media/cloud.png", Color4F(0.9, 0.9, 0.9, 1.0), 2);
 }
 
 void FPGameManager::Draw() {
@@ -40,59 +107,35 @@ void FPGameManager::Draw() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	m_gl->CamLook();
+	gluLookAt(m_camPos[0], m_camPos[1], m_camPos[2], m_camPos[0], m_camPos[1], m_camPos[2] -1, 0, 1, 0);
 
-	// 绘制云朵
-	m_cloud->draw();
+	if (m_GameState == FPGameState::Play) {
+		m_cloud->Draw();	      // 绘制云朵
+		m_objManager->DrawOBJ();  // 绘制游戏对象
+	}
+	
+	// 绘制GUI
+	//m_guiManager->RenderGUI();
 
-	// 绘制导弹
-	glPushMatrix();
-	glTranslated(-6, -10.2, -47);
-	glRotatef(-90, 0, 1, 0);
-	glScalef(0.1, 0.1, 0.1);
-	missile->draw();
-	glPopMatrix();
+	SwapBuffers(m_hdc);
+}
 
-	glPushMatrix();
-	glTranslated(6, -10.2, -47);
-	glRotatef(-90, 0, 1, 0);
-	glScalef(0.1, 0.1, 0.1);
-	missile->draw();
-	glPopMatrix();
+void FPGameManager::Update() {
+	if (m_GameState == FPGameState::Play) {
+		m_cloud->Update();
+		m_objManager->UpDate();
 
-	// 绘制飞机
-	glPushMatrix();
-	glTranslated(0, -8, -50);
-	glRotatef(-90, 0, 1, 0);
-	glRotatef(-90, 1, 0, 0);
-	glScalef(0.5, 0.5, 0.5);
-	plane->draw();
-	glPopMatrix();
+		int score = m_objManager->getScore();
+		int blood = m_objManager->getBlood();
 
-	// 绘制火焰
-	glPushMatrix();
-	glTranslated(6, -10.2, -42);
-	glRotatef(90, 1, 0, 0);
-	glScalef(0.2, 0.2, 0.2);
-	jetFlame->Frame(3);
-	glPopMatrix();
+		cout << "score: " << score << endl;
+		cout << "blood:" << blood << endl;
 
-	glPushMatrix();
-	glTranslated(-6, -10.2, -42);
-	glRotatef(90, 1, 0, 0);
-	glScalef(0.2, 0.2, 0.2);
-	jetFlame->Frame(3);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslated(0, -8.5, -40);
-	glRotatef(90, 1, 0, 0);
-	glScalef(0.4, 0.4, 0.4);
-	jetFlame->Frame(6);
-	glPopMatrix();
-
-	// 绘制所有GUI
-	m_guiManager->RenderGUI();
-
-	m_gl->Flush();
+		/*if (score = 100) {
+			m_GameState == FPGameState::Success;
+		}
+		if (blood <= 0) {
+			m_GameState == FPGameState::Failure;
+		}*/
+	}
 }

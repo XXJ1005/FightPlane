@@ -1,4 +1,16 @@
-glTranslated(0, -8, -50);
-glRotatef(-90, 0, 1, 0);
-glRotatef(-90, 1, 0, 0);
-glScalef(0.5, 0.5, 0.5);
+机头朝上（正Y轴）
+
+特效参数
+m_jetflame->setDirection(glm::vec3(0, -1, 0));
+m_jetflame->setScale(1.8);
+m_jetflame->setPos(glm::vec3(0, -38, -2));
+
+
+导弹参数
+m_leftMissile->setDirection(glm::vec3(-0.1, 1, 0));
+m_leftMissile->setScale(1.8);
+m_leftMissile->setPos(glm::vec3(-22, -8, -9.2));
+
+m_rightMissile->setDirection(glm::vec3(0.1, 1, 0));
+m_rightMissile->setScale(1.8);
+m_rightMissile->setPos(glm::vec3(22, -8, -9.2));

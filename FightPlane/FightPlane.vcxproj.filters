@@ -72,9 +72,6 @@
     <ClInclude Include="forkParticle\ParticleEffect.h">
       <Filter>头文件\forkParticle</Filter>
     </ClInclude>
-    <ClInclude Include="glUtility.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="FPGameManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -88,6 +85,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="FPSoundManager.h">
+		<Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="path.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FPOBJManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -140,9 +146,6 @@
     <ClCompile Include="forkParticle\ParticleEffect.cpp">
       <Filter>源文件\forkParticle</Filter>
     </ClCompile>
-    <ClCompile Include="glUtility.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="FPGameManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -153,6 +156,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FPSoundManager.cpp">
+		<Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FPOBJManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
