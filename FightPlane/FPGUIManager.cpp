@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 #include <GL/GL.h>
 #include <gl/GLU.h>
 #include "FPGUIManager.h"
@@ -36,7 +37,7 @@ void FPGUIManager::RenderGUI() {
 }
 
 void FPGUIManager::InitStartGameGUI() {
-	// 创建开始游戏按钮
+	// 创建开始游戏按钮0
 	RECT windowsRect;
 	GetClientRect(GameHwnd, &windowsRect);
 
@@ -77,14 +78,15 @@ void FPGUIManager::RenderStartGameGUI() {
 }
 
 void FPGUIManager::InitPlayGameGUI() {
-	Color3D color;
-	color.r = 255.0; color.g = 0.0; color.b = 0.0;
-	m_ScoreText = new FPText(-0.1, -0.3, 64, color);
-
-	// 最大生命值
 	// 窗口大小
 	int windowRect[4];
 	glGetIntegerv(GL_VIEWPORT, windowRect);
+
+	Color3D color;
+	color.r = 255.0; color.g = 0.0; color.b = 0.0;
+	m_ScoreText = new FPText(0, 0, 64, color);
+
+	// 最大生命值
 
 	int lifeMaxCount = 5;
 	for (size_t i = 1; i <= lifeMaxCount; i++) {
@@ -97,33 +99,13 @@ void FPGUIManager::InitPlayGameGUI() {
 void FPGUIManager::RenderPlayGameGUI() {
 
 	// 得分面板
-	static int planeScore = 0;
+	int planeScore = FPGameManager::GetInstance()->GetOBJManager()->getScore();
 	char buffer[1024];
 	sprintf(buffer, "SCORE: %d", planeScore);
-	planeScore += rand() % 3;
-
-	if (planeScore >= 10000) {
-		FPGameManager::GetInstance()->SetCurrentGameState(FPGameManager::FPGameState::Success);
-		return;
-	}
-
 	m_ScoreText->Render(buffer);
 
 	// 血条
-	static int lifeCount = 0;
-	static int timeCount = 0;
-
-	if (timeCount > 10) {
-		lifeCount = rand() % 5;
-		if (lifeCount < 0) {
-			FPGameManager::GetInstance()->SetCurrentGameState(FPGameManager::FPGameState::Failure);
-			return;
-		}
-		timeCount = 0;
-	}
-	else {
-		timeCount++;
-	}
+	int lifeCount = FPGameManager::GetInstance()->GetOBJManager()->getBlood();
 	 
 	for (size_t i = 0; i < lifeCount; i++) {
 		m_lifeIcons.at(i)->Render();
@@ -477,7 +459,9 @@ void FPText::Render(const char* text) {
 	int height = GetDeviceCaps(hDC, LOGPIXELSY); // 一英寸对应像素值，一英寸为72pt
 	int fontPixel = height / 72.0 * m_fontSize;
 
-	glTranslatef(m_x - 1.0, m_y + 1.0, -1.0f);
+	glLoadIdentity();
+
+	glTranslatef(m_x-0.5, m_y+0.32, -1.0f);
 	glColor3f(m_color.r/255.0, m_color.g/255.0, m_color.b/255.0); // 颜色
 	glRasterPos2f(0.0f, 0.0f); // 输出位置
 	glListBase(base - 0);       // 设置显示列表的基础值  

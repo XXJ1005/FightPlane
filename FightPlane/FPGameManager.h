@@ -27,6 +27,7 @@ public:
 
 	FPGUIManager *GetGuiManager() { return m_guiManager; }
 	FPSoundManager *GetSoundManager() { return m_soundManager; }
+	FPOBJManager *GetOBJManager() { return m_objManager; }
 	FPGameState GetCurrentGameState() { return m_GameState; }
 
 	void SetCurrentGameState(FPGameState gameState) { m_GameState = gameState; }

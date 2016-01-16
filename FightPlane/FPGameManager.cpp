@@ -83,7 +83,7 @@ void FPGameManager::InitScene() {
 	m_camPos = glm::vec3(0, 0, 0);
 
 	// 设置游戏状态
-	m_GameState = FPGameState::Play;
+	m_GameState = FPGameState::Start;
 
 	// 初始化游戏UI界面
 	m_guiManager = new FPGUIManager();
@@ -115,7 +115,7 @@ void FPGameManager::Draw() {
 	}
 	
 	// 绘制GUI
-	//m_guiManager->RenderGUI();
+	m_guiManager->RenderGUI();
 
 	SwapBuffers(m_hdc);
 }
@@ -131,11 +131,11 @@ void FPGameManager::Update() {
 		cout << "score: " << score << endl;
 		cout << "blood:" << blood << endl;
 
-		/*if (score = 100) {
-			m_GameState == FPGameState::Success;
+		if (score == 10) {
+			m_GameState = FPGameState::Success;
 		}
 		if (blood <= 0) {
-			m_GameState == FPGameState::Failure;
-		}*/
+			m_GameState = FPGameState::Failure;
+		}
 	}
 }

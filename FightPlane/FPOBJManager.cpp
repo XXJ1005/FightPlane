@@ -1,4 +1,5 @@
 #include "FPOBJManager.h"
+#include "FPGameManager.h"
 #include <iostream>
 using namespace std;
 
@@ -34,6 +35,9 @@ void FPOBJManager::addGamerMissile(glm::mat4 pose) {
 			m_gamerMissile[i]->setIsIdle(false);
 			m_gamerMissile[i]->setOriginPose(pose);
 			m_gamerMissile[i]->setMissileState(Missile::MissileState::Ready);
+
+			// Ìí¼Óµ¼µ¯·¢ÉäÉùÒô
+			FPGameManager::GetInstance()->GetSoundManager()->PlayMissileEmitSound();
 			break;
 		}
 	}
@@ -45,6 +49,9 @@ void FPOBJManager::addEnemyMissile(glm::mat4 pose) {
 			m_enemyMissile[i]->setIsIdle(false);
 			m_enemyMissile[i]->setOriginPose(pose);
 			m_enemyMissile[i]->setMissileState(Missile::MissileState::Ready);
+
+			// Ìí¼Óµ¼µ¯·¢ÉäÉùÒô
+			FPGameManager::GetInstance()->GetSoundManager()->PlayMissileEmitSound();
 			break;
 		}
 	}
@@ -115,6 +122,7 @@ void FPOBJManager::UpDate() {
 						m_enemys[j]->DealCollision(m_gamerMissile[i]->getDamage());
 						m_gamerMissile[i]->DealCollision(m_enemys[j]->getDamage());
 						m_score++;
+						FPGameManager::GetInstance()->GetSoundManager()->PlayMissileBmobSound();
 					}
 				}
 			}

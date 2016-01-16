@@ -232,15 +232,6 @@ public:
 	void setMissileState(MissileState state) { m_currentState = state; }
 	MissileState getMissileState() { return m_currentState; }
 
-	Point3F getDirection() { return m_direction; }
-	void setDirection(double deltaTime);
-
-	Point3F getPos() { return m_pos; }
-	void setPos(double deltaTime);
-
-	void setLastDirection(Point3F lastDir) { m_lastDirection = lastDir; }
-	void setLastPos(Point3F lastPos) { m_lastPos = lastPos; }
-
 private:
 	Path *m_path;
 	float m_time;

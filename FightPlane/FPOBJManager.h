@@ -11,7 +11,7 @@ public:
 
 	GamerFighter* getGamer() { return m_gamer;}
 	int getScore() { return m_score; }
-	int getBlood() { return m_gamer->getBlood(); }
+	int getBlood() { return m_gamer->getBlood() / 20; }
 
 	void addGamerMissile(glm::mat4 pose);
 

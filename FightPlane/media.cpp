@@ -446,6 +446,7 @@ void GamerFighter::Update(FPOBJManager *objManager) {
 
 void GamerFighter::DealCollision(int damage) {
 	m_blood -= damage;
+	FPGameManager::GetInstance()->GetSoundManager()->PlayGamerHittedSound();
 }
 
 EnemyFighter::EnemyFighter() {
