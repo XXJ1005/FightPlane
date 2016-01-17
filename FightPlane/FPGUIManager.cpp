@@ -431,7 +431,7 @@ void FPText::Render(const char* text) {
 	if (m_font == nullptr) {
 
 		base = glGenLists(256);     // 创建96个显示列表  
-		font = CreateFont(m_fontSize,      // 字体高度  
+		m_font = CreateFont(m_fontSize,      // 字体高度  
 			0,      // 字体宽度  
 			0,      // 字体的旋转角度  
 			0,      // 字体底线的旋转角度  
@@ -445,11 +445,9 @@ void FPText::Render(const char* text) {
 			ANTIALIASED_QUALITY,    // 输出质量  
 			FF_DONTCARE | DEFAULT_PITCH,
 			"Courier New"); // 字体名称  
-		m_font = (HFONT)SelectObject(wglGetCurrentDC(), font); // 选择我们需要的字体  
-		wglUseFontBitmaps(wglGetCurrentDC(), 0, 256, base);     // 创建96个显示列表，绘制从ASCII码为32-128的字符  
-		SelectObject(wglGetCurrentDC(), m_font);
-		DeleteObject(font);
 	}
+	wglUseFontBitmaps(wglGetCurrentDC(), 0, 256, base);     // 创建96个显示列表，绘制从ASCII码为32-128的字符  
+	SelectObject(wglGetCurrentDC(), m_font);
 
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glPushAttrib(GL_LIST_BIT);  // 把显示列表属性压入属性堆栈  
