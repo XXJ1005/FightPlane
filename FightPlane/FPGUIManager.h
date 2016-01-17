@@ -148,6 +148,7 @@ private:
 	float m_x, m_y;
 	int m_fontSize;
 	Color3D m_color;
+	HFONT m_font;
 };
 
 class FPIcon {

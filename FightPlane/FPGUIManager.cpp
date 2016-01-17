@@ -427,27 +427,29 @@ void FPText::Render(const char* text) {
 
 	GLuint base;
 	HFONT font;
-	HFONT oldfont;
 
-	base = glGenLists(256);     // 创建96个显示列表  
-	font = CreateFont(m_fontSize,      // 字体高度  
-		0,      // 字体宽度  
-		0,      // 字体的旋转角度  
-		0,      // 字体底线的旋转角度  
-		FW_BOLD,// 字体重量  
-		FALSE,  // 是否使用斜体  
-		FALSE,  // 是否使用下划线  
-		FALSE,  // 是否使用删除线  
-		ANSI_CHARSET,   // 设置字符集  
-		OUT_TT_PRECIS,  // 输出精度  
-		CLIP_DEFAULT_PRECIS,    // 剪裁精度  
-		ANTIALIASED_QUALITY,    // 输出质量  
-		FF_DONTCARE | DEFAULT_PITCH,
-		"Courier New"); // 字体名称  
-	oldfont = (HFONT)SelectObject(wglGetCurrentDC(), font); // 选择我们需要的字体  
-	wglUseFontBitmaps(wglGetCurrentDC(), 0, 256, base);     // 创建96个显示列表，绘制从ASCII码为32-128的字符  
-	SelectObject(wglGetCurrentDC(), oldfont);
-	DeleteObject(font);
+	if (m_font == nullptr) {
+
+		base = glGenLists(256);     // 创建96个显示列表  
+		font = CreateFont(m_fontSize,      // 字体高度  
+			0,      // 字体宽度  
+			0,      // 字体的旋转角度  
+			0,      // 字体底线的旋转角度  
+			FW_BOLD,// 字体重量  
+			FALSE,  // 是否使用斜体  
+			FALSE,  // 是否使用下划线  
+			FALSE,  // 是否使用删除线  
+			ANSI_CHARSET,   // 设置字符集  
+			OUT_TT_PRECIS,  // 输出精度  
+			CLIP_DEFAULT_PRECIS,    // 剪裁精度  
+			ANTIALIASED_QUALITY,    // 输出质量  
+			FF_DONTCARE | DEFAULT_PITCH,
+			"Courier New"); // 字体名称  
+		m_font = (HFONT)SelectObject(wglGetCurrentDC(), font); // 选择我们需要的字体  
+		wglUseFontBitmaps(wglGetCurrentDC(), 0, 256, base);     // 创建96个显示列表，绘制从ASCII码为32-128的字符  
+		SelectObject(wglGetCurrentDC(), m_font);
+		DeleteObject(font);
+	}
 
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glPushAttrib(GL_LIST_BIT);  // 把显示列表属性压入属性堆栈  
